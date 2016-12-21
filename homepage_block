@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+	
+	<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	
+	<!--Styling for body -->
+	<link rel="stylesheet" type="text/css" href="10ef3e27db636200896b5990cf9619ff.cssdbx"></link>
+	
+	<style>
+		#home_title { 
+			display: none;
+		}
+		.row-centered {
+			text-align:center;
+		}
+		.col-centered {
+			display:inline-block;
+			float:none;
+			text-align:left;
+			margin-right:-4px;
+}
+	</style>
+	
+	<body>
+		<!--TILES-->
+		<div class="row noPrint" style="padding-left: 50px; padding-right: 50px; padding-top: 0px;">		   			
+			<div class="col-md-3">
+				<a href="https://dev27211.service-now.com/catalog_home.do?sysparm_view=catalog_default" target="_self" style="color: white; text-decoration: none;">
+					<div class="tile green">                
+						<h3 class="title" style="font-size: 17px !important;"><span class="glyphicon glyphicon-shopping-cart" style="padding-right: 12px;"></span>Internal Service Catalog</h3>   
+						<hr />
+						<p>Request items internal to IT</p>
+					</div>
+				</a>
+			</div>
+			 <div class="col-md-3">
+				<a href="https://dev27211.service-now.com/catalog_home.do?sysparm_view=catalog_default" target="_self" style="color: white; text-decoration: none;">
+					<div class="tile orange">
+						<h3 class="title" style="font-size: 17px !important;"><span class="glyphicon glyphicon-paperclip" style="padding-right: 12px;"></span>External Service Catalogs</h3>	
+						<hr />
+						<p>Request applications, software, hardware or mobile devices</p>
+					</div>
+				</a>
+			</div>
+			<div class="col-md-3">
+				<a href="https://dev27211.service-now.com/knowledge_home_launcher.do" target="_self" style="color: white; text-decoration: none;">
+					<div class="tile purple">               
+						<h3 class="title" style="font-size: 17px !important;"><span class="glyphicon glyphicon-question-sign" style="padding-right: 12px;"></span>Knowledge Base</h3> 
+						<hr />
+						<p>Browse the knowledge base</p>
+					</div>
+				</a>
+			</div> 
+			<div class="col-md-3">
+				<a href="#isSomethingBrokenModal" data-toggle="modal" data-target="#isSomethingBrokenModal" target="_blank" style="color: white; text-decoration: none;">
+					<div class="tile blue">              
+						<h3 class="title" style="font-size: 17px !important;"><span class="glyphicon glyphicon-wrench" style="padding-right: 12px;"></span>Troubleshooting or Have a Question?</h3> 
+						<hr />
+						<p>Is something broken?</p>
+					</div>
+				</a>
+			</div>
+		</div>
+
+		<hr />
+		<!--TABLES WITH USER WITH APPROVALS-->
+		<!--<j:if test="${jvar_CurrentUserHasApprovals > 1}">-->
+			<div class="row" style="padding-left: 50px; padding-right: 50px;">		
+				<div class="col-md-6">
+					<div class="Order-list">
+						<div class="panel panel-default">
+							<div class="panel-heading" style="text-align: center; font-size: 18px;">
+								My Open Incidents/Requests
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" style="height: 240px; overflow: auto;">
+									<table class="table table-striped table-bordered table-hover">
+										<thead>
+											<tr>
+												<th style="text-align: left; font-size: 15px;">Number</th>
+												<th style="text-align: left; font-size: 15px;">Short Description</th>
+												<th style="text-align: left; font-size: 15px;">Requested</th>
+											</tr>
+										</thead>
+										<tbody>	
+
+										<j:set var="jvar_hasRequests" value="1"/>
+										<!--INCIDENTS-->
+										<g:evaluate>
+											var currentUser = gs.getUserID();
+											var inc = new GlideRecord('incident');									
+											inc.addQuery('active', 'true');
+											inc.addQuery('caller_id', currentUser);
+											inc.orderByDesc('opened_at');
+											inc.query();															
+										</g:evaluate>								
+
+										<j:while test="${inc.next()}">
+											<j:set var ="jvar_hasRequests" value="${jvar_hasRequests + 1}"/>
+											<tr>
+												<td style="text-align: left; font-size: 13px;"><a class="linked" target="_self" style="text-decoration: underline; color: #4F81BD  !important; font-weight: 600;" href="incident.do?sys_id=${inc.sys_id}">${inc.number}</a></td>
+												<td style="text-align: left; font-size: 13px;">${inc.short_description}</td>
+												<td style="text-align: left; font-size: 13px;">${inc.opened_at}</td>
+											</tr>
+										</j:while>   
+
+										<!--REQUESTS-->
+										<g:evaluate>
+											var currentUser = gs.getUserID();
+											var req = new GlideRecord('sc_request');									
+											req.addQuery('active', 'true');
+											req.addQuery('requested_for', currentUser);
+											req.orderByDesc('opened_at');
+											req.query();															
+										</g:evaluate>
+
+										<j:while test="${req.next()}">
+											<j:set var ="jvar_hasRequests" value="${jvar_hasRequests + 1}"/>
+											<tr>
+												<td style="text-align: left; font-size: 13px;"><a class="linked" target="_self" style="text-decoration: underline; color: #4F81BD  !important; font-weight: 600;" href="sc_request.do?sys_id=${req.sys_id}">${req.number}</a></td>
+												<td style="text-align: left; font-size: 13px;">${req.short_description}</td>
+												<td style="text-align: left; font-size: 13px;">${req.opened_at}</td>
+											</tr>
+										</j:while>   																		
+										</tbody>							
+									</table>							
+									<j:if test="${jvar_hasRequests == 1}">
+											<div class="alert alert-danger" style="text-align: center;">
+												You have no requests in our system
+											</div>
+									</j:if>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 yesPrint">
+					<div class="Order-list">
+						<div class="panel panel-default">
+							<div class="panel-heading" style="text-align: center; font-size: 18px;">
+								My Pending Approvals
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive" style="height: 240px; overflow: auto;">
+									<table class="table table-striped table-bordered table-hover">
+										<thead>
+											<tr>
+												<th style="text-align: left; font-size: 15px;">Number</th>
+												<th style="text-align: left; font-size: 15px;">State</th>
+												<th style="text-align: left; font-size: 15px;">Requester</th>
+												<th style="text-align: left; font-size: 15px;">Requested</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										<j:set var="jvar_hasApprovals" value="1"/>
+										<g:evaluate>
+											var currentUser = gs.getUserID();
+											var appr = new GlideRecord('sysapproval_approver');									
+											appr.addQuery('state', 'requested');
+											appr.addQuery('approver', currentUser);
+											appr.orderBy('sys_created_on');
+											appr.query();															
+										</g:evaluate>									
+
+										<j:while test="${appr.next()}">																			
+											<j:choose>
+												<j:when test="${appr.document_id.getDisplayValue().indexOf('Change Request') > -1}">
+													<j:set var ="jvar_hasApprovals" value="${jvar_hasApprovals + 1}"/>
+													<tr>
+														<td style="text-align: left; font-size: 13px;"><a class="linked" target="_self" style="text-decoration: underline; color: #007f00  !important; font-weight: 600;" href="sysapproval_approver.do?sys_id=${appr.sys_id}">Change Request: ${appr.sysapproval.number.getDisplayValue()}</a><br /></td>										
+														<!--<td style="text-align: left; font-size: 13px;">${appr.state.getDisplayValue()}</td>-->
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.state.getDisplayValue()}</td>
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.sys_created_by.getDisplayValue()}</td>
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.sys_created_on.getDisplayValue()}</td>										
+													</tr>
+												</j:when>
+												<j:otherwise>
+													<j:set var ="jvar_hasApprovals" value="${jvar_hasApprovals + 1}"/>
+													<tr>
+														<td style="text-align: left; font-size: 13px;"><a class="linked" target="_self" style="text-decoration: underline; color: #007f00  !important; font-weight: 600;" href="sysapproval_approver.do?sys_id=${appr.sys_id}">${appr.document_id.getDisplayValue()}</a><br /></td>										
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.state.getDisplayValue()}</td>
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.sys_created_by.getDisplayValue()}</td>
+														<td style="text-align: left; font-size: 13px;">${appr.sysapproval.sys_created_on.getDisplayValue()}</td>										
+													</tr>
+												</j:otherwise>	
+											</j:choose>
+										</j:while>	
+										</tbody>								
+									</table>
+									<j:if test="${jvar_hasApprovals == 1}">
+											<div class="alert alert-danger" style="text-align: center;">
+												You have no pending approvals in our system
+											</div>
+									</j:if>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<!--</j:if>-->	
+
+		<hr />
+		<!--NEWS-->
+		<div class="row noPrint" style="padding-left: 50px; padding-right: 50px;">
+			<div class="col-md-6">
+				<ul class="list-group">
+					<li class='list-group-item' style='background-color: #EFEFEF; font-size: 18px; text-align: center;'>Maintenance Activities</li>
+					<g:evaluate>	
+						var kb = new GlideRecord('kb_knowledge');
+						kb.setCategory('homepage');
+						kb.addQuery('topic','News');
+						kb.addQuery('workflow_state','published'); 
+						kb.setLimit(5);
+						kb.orderByDesc('published');
+						kb.query();
+					</g:evaluate>
+
+					<j:set var="jvar_hasMaintArticles" value="1"/>
+
+					<j:while test="${kb.next()}">
+						<j:set var ="jvar_hasMaintArticles" value="${jvar_hasMaintArticles + 1}"/>
+						<li class="list-group-item">
+						<a href="kb_view.do?sys_kb_id=${kb.sys_id}" target="_self"><span class="label label-default label-pill pull-right" style="background-color: #5133AB; width: 70px; height: 25px; font-size: 15px;">Read</span></a>
+						${kb.short_description}</li>    
+					</j:while>                           
+				</ul>
+				<j:if test="${jvar_hasMaintArticles == 1}">
+					<div class="alert alert-info" style="text-align: center;">
+						PASA IT has no "Maintenance Activities" to display at this time
+					</div>
+				</j:if>
+			</div>
+			<div class="col-md-6">
+				 <ul class="list-group">
+					 <li class='list-group-item' style='background-color: #EFEFEF; font-size: 18px; text-align: center;'>Featured Content</li>
+					<g:evaluate>	
+						var kb = new GlideRecord('kb_knowledge');
+						kb.setCategory('homepage');
+						kb.addQuery('topic','Featured News'); 
+						kb.addQuery('category','Featured Article');
+						kb.addQuery('workflow_state','published'); 
+						kb.setLimit(5);
+						kb.orderByDesc('published');
+						kb.query();
+					</g:evaluate>
+
+					 <j:set var="jvar_hasGlobalArticles" value="1"/>
+
+					<j:while test="${kb.next()}">
+						<j:set var ="jvar_hasGlobalArticles" value="${jvar_hasGlobalArticles + 1}"/>
+						<li class="list-group-item">
+						<a href="kb_view.do?sys_kb_id=${kb.sys_id}" target="_self"><span class="label label-default label-pill pull-right" style="background-color: #5133AB; width: 70px; height: 25px; font-size: 15px;">Read</span></a>
+						${kb.short_description}</li>    
+					</j:while>                           
+				</ul>
+				<j:if test="${jvar_hasGlobalArticles == 1}">
+					<div class="alert alert-info" style="text-align: center;">
+						IT has no "Featured Content" articles to display at this time
+					</div>
+				</j:if>
+			</div>
+		</div>
+
+		<hr/>
+		<div class="row" style="padding-left: 50px; padding-right: 50px;">
+			<div class="col-md-12">
+				<div style="text-align: center; padding-bottom: 15px;">
+					<h4>Do you have suggestions, ideas or complaints about our site?</h4>
+					<a href="#" target="_blank" style="text-decoration: none;" class="btn btn-default">Submit Feedback</a>
+				</div>			
+			</div>
+		</div>
+
+		<!--TROUBLESHOOTING MODAL-->
+		<div class="modal fade" id="isSomethingBrokenModal" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2 class="text-center" style="font-weight: 600; color: #E38D13;">Is something broken?</h2>                      
+					</div>
+					<div class="modal-body">          
+						<div class="list-group">
+							<a href="#" target="_self" class="list-group-item">
+								<h4 class="list-group-item-heading" style="font-weight: 500; color: #E38D13;"><span class="glyphicon glyphicon-envelope" style="padding-right: 10px; color: #E38D13;"></span>Submit an incident</h4>
+								<p class="list-group-item-text" style="color: gray;">Fill this form out if a problem or error has occured that your IT department is responsible for fixing.</p>
+							</a>
+							<a href="#" target="_blank" class="list-group-item">
+								<h4 class="list-group-item-heading" style="font-weight: 500; color: #E38D13;"><span class="glyphicon glyphicon-lock" style="padding-right: 10px; color: #E38D13;"></span>Reset Password</h4>
+								<p class="list-group-item-text" style="color: gray;">Click here to reset your domain password.</p>
+							</a>
+							<a href="#" target="_self" class="list-group-item">
+								<h4 class="list-group-item-heading" style="font-weight: 500; color: #E38D13;"><span class="glyphicon glyphicon-question-sign" style="padding-right: 10px; color: #E38D13;"></span>Ask a question</h4>
+								<p class="list-group-item-text" style="color: gray;">Click here if you have a specific question for IT, they will categorize and prioritize upon receiving.</p>
+							</a>                          
+						</div>
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-danger" data-dismiss="modal">Close</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	
+</j:jelly>
